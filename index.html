@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #f0f4f8, #d9e2ec);
+    margin: 0;
+    padding: 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  th, td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    font-size: 14px;
+  }
+
+  th {
+    background-color: #f5f5f5;
+    color: #333;
+  }
+
+  .empty {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+  }
+
+  .no-vehicle {
+    background-color: rgba(255, 0, 0, 0.18);
+    color: #b30000;
+    font-weight: 600;
+  }
+
+</style>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Civil Workers Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Roboto+Slab:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0f1724;--card:#0b1220;--accent:#38bdf8;
+      --muted:#94a3b8;--glass:rgba(255,255,255,0.03);
+    }
+    body{margin:0;font-family:"Inter",system-ui;background:linear-gradient(180deg,var(--bg),#071021 80%);color:#e6eef8;}
+    .container{max-width:900px;margin:40px auto;padding:24px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.6);}
+
+    h1{text-align:center;font-family:"Roboto Slab",serif;}
+    h2{margin-top:25px;color:#38bdf8;text-align:left;}
+
+    .stats{display:flex;gap:12px;margin-bottom:12px;}
+    .stat{flex:1;background:var(--card);padding:12px;border-radius:8px;text-align:center;}
+    .stat strong{display:block;font-size:18px;}
+    .stat span{font-size:12px;color:var(--muted);}
+
+    input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);background:var(--glass);color:#e6eef8;font-size:14px;margin:10px 0;}
+
+    table{width:100%;border-collapse:collapse;color:#e6eef8;font-size:13px;}
+    th,td{padding:8px 10px;text-align:left;border-bottom:1px dashed rgba(255,255,255,0.05);}
+    th{color:var(--muted);}
+
+    a{color:var(--accent);text-decoration:none;font-size:14px;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Civil Workers Dashboard</h1>
+
+    <div class="stats">
+      <div class="stat"><strong id="totalEntries">0</strong><span>Total Entries</span></div>
+      <div class="stat"><strong id="uniqueWorkers">0</strong><span>Unique Workers</span></div>
+      <div class="stat"><strong id="uniqueVehicles">0</strong><span>Unique Vehicles</span></div>
+    </div>
+
+    <label>Search</label>
+    <input id="search" type="text" placeholder="Search by name, role, or vehicle...">
+
+    <!-- TABLE 1: WORKERS WITH VEHICLE -->
+    <h2>Workers With Vehicle </h2>
+    <div style="overflow:auto;max-height:320px;">
+      <table>
+        <thead>
+          <tr><th>Worker</th><th>Vehicle Type</th><th>Role</th><th>Vehicle No.</th><th>Phone</th><th>Notes</th></tr>
+        </thead>
+        <tbody id="withVehicleBody"><tr><td colspan="6" class="empty">No entries</td></tr></tbody>
+      </table>
+    </div>
+
+    <!-- TABLE 2: WORKERS WITHOUT VEHICLE -->
+    <h2>Workers Only</h2>
+    <div style="overflow:auto;max-height:320px;">
+      <table>
+        <thead>
+          <tr><th>Worker</th><th>Vehicle Type</th><th>Role</th><th>Vehicle No.</th><th>Phone</th><th>Notes</th></tr>
+        </thead>
+        <tbody id="withoutVehicleBody"><tr><td colspan="6" class="empty">No entries</td></tr></tbody>
+      </table>
+    </div>
+
+    <p style="text-align:center;margin-top:16px;">
+      <a href="form.html">+ Add New Entry</a>
+    </p>
+  </div>
+
+<script>
+const STORAGE_KEY='cwv_entries_v1';
+
+const totalEntries=document.getElementById('totalEntries');
+const uniqueWorkers=document.getElementById('uniqueWorkers');
+const uniqueVehicles=document.getElementById('uniqueVehicles');
+
+const withVehicleBody=document.getElementById('withVehicleBody');
+const withoutVehicleBody=document.getElementById('withoutVehicleBody');
+
+const searchInput=document.getElementById('search');
+
+function getEntries(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY))||[]; }
+  catch(e){ return []; }
+}
+
+function escapeHtml(s){
+  return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;')
+                  .replaceAll('>','&gt;').replaceAll('"','&quot;');
+}
+
+function renderList(filter=''){
+  const list=getEntries();
+
+  const filtered = filter.trim()
+    ? list.filter(it=>{
+        const s=filter.toLowerCase();
+        return (it.workerName||'').toLowerCase().includes(s)
+            || (it.role||'').toLowerCase().includes(s)
+            || (it.vehicleNo||'').toLowerCase().includes(s);
+      })
+    : list;
+
+  withVehicleBody.innerHTML='';
+  withoutVehicleBody.innerHTML='';
+
+  let withCount=0, withoutCount=0;
+
+  filtered.slice().reverse().forEach(e=>{
+    const hasVehicle=(e.vehicleNo||e.assignedVehicle||'').trim()!='';
+
+    const tr=document.createElement('tr');
+    if(!hasVehicle) tr.classList.add('no-vehicle');
+
+    tr.innerHTML=`
+      <td>${escapeHtml(e.workerName||'')}</td>
+      <td>${escapeHtml(e.vehicleType||'')}</td>
+      <td>${escapeHtml(e.role||'')}</td>
+      <td>${
+          hasVehicle 
+          ? escapeHtml(e.vehicleNo||e.assignedVehicle)
+          : '<span style="color:#ff4d4d;font-weight:700;">Not Assigned</span>'
+      }</td>
+      <td>${escapeHtml(e.phone||'')}</td>
+      <td>${escapeHtml((e.vehicleCondition||'').slice(0,50))}</td>
+    `;
+
+    if(hasVehicle){
+      withVehicleBody.appendChild(tr);
+      withCount++;
+    } else {
+      withoutVehicleBody.appendChild(tr);
+      withoutCount++;
+    }
+  });
+
+  if(withCount===0) 
+    withVehicleBody.innerHTML='<tr><td colspan="6" class="empty">No workers with vehicle</td></tr>';
+
+  if(withoutCount===0)
+    withoutVehicleBody.innerHTML='<tr><td colspan="6" class="empty">All workers have vehicles assigned</td></tr>';
+
+  totalEntries.textContent=list.length;
+  uniqueWorkers.textContent=new Set(list.map(i=>(i.workerId||i.workerName||'').trim())).size;
+  uniqueVehicles.textContent=new Set(list.map(i=>(i.vehicleNo||i.assignedVehicle||'').trim()).filter(Boolean)).size;
+}
+
+searchInput.addEventListener('input',e=>renderList(e.target.value));
+renderList();
+</script>
+</body>
+</html>

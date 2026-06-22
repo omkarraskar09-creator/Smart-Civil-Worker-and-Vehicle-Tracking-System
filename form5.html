@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Add Worker & Vehicle Details</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Roboto+Slab:wght@400;600&display=swap" rel="stylesheet">
+
+ 
+<style>
+  :root {
+    --bg: #0f1724;
+    --card: rgba(11, 18, 32, 0.85);
+    --accent: #38bdf8;
+    --muted: #94a3b8;
+    --danger: #ef4444;
+    --glass: rgba(255, 255, 255, 0.05);
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: "Inter", system-ui;
+    background: url('https://images.pexels.com/photos/34203866/pexels-photo-34203866.jpeg') no-repeat center center fixed;
+    background-size: cover;
+    color: #e6eef8;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 36px auto;
+    padding: 28px;
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(2, 6, 23, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+  }
+
+  h1 {
+    font-family: "Roboto Slab", serif;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #ffffff;
+  }
+
+  label {
+    display: block;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--glass);
+    color: #e6eef8;
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+
+  button {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 0;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #021028;
+  }
+
+  .btn-primary:hover {
+    background: #0ea5e9;
+  }
+
+  .btn-danger {
+    background: var(--danger);
+    color: #fff;
+  }
+
+  .btn-danger:hover {
+    background: #dc2626;
+  }
+
+  .actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 14px;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+</style>
+    </head>
+<body>
+  <div class="container">
+    <h1>Add Worker & Vehicle Details</h1>
+
+    <form id="dataForm" autocomplete="off" novalidate>
+      <label>Worker Name</label>
+      <input id="workerName" required placeholder="e.g., Mahesh Jadhav">
+
+      <label>Worker ID</label>
+      <input id="workerId" placeholder="e.g., W1001">
+
+      <label>Role / Trade</label>
+      <input id="role" placeholder="e.g., Worker, Driver, etc">
+
+      <label>Phone</label>
+      <input id="phone" placeholder="+91 98xxxxxxxx" pattern="[0-9+\-\s]*">
+
+      <label>Assigned Vehicle</label>
+      <select id="assignedVehicle"><option value="">-- none --</option></select>
+
+      <label>Date</label>
+      <input id="attendanceDate" type="date">
+
+      <label>Vehicle Number</label>
+      <input id="vehicleNo" placeholder="e.g., MH10AB1234">
+
+      <label>Vehicle Type</label>
+      <select id="vehicleType">
+        <option value="">-- select --</option>
+        <option>Truck</option><option>JCB</option><option>Crane</option>
+        <option>Tipper</option><option>Tractor</option><option>None</option>
+      </select>
+
+      <label>Vehicle Condition / Notes</label>
+      <textarea id="vehicleCondition" placeholder="Fuel, tyres, damage..."></textarea>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" id="saveBtn">Save Entry</button>
+        <button type="button" class="btn-danger" id="deleteAllBtn">Delete All</button>
+      </div>
+    </form>
+
+    <p style="text-align:center;margin-top:16px;">
+      <a href="index.html">Go to Dashboard →</a>
+    </p>
+  </div>
+
+  <script>
+    const STORAGE_KEY='cwv_entries_v1';
+    const assignedVehicle=document.getElementById('assignedVehicle');
+    const saveBtn=document.getElementById('saveBtn');
+    const deleteAllBtn=document.getElementById('deleteAllBtn');
+    const form=document.getElementById('dataForm');
+
+    function getEntries(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||[];}catch(e){return[];}}
+    function saveEntries(list){localStorage.setItem(STORAGE_KEY,JSON.stringify(list));}
+    function uid(){return'id_'+Math.random().toString(36).slice(2,9);}
+    function addVehicleOption(v){if(!v)return;const exists=[...assignedVehicle.options].some(o=>o.value===v);if(!exists){const o=document.createElement('option');o.value=v;o.textContent=v;assignedVehicle.appendChild(o);}}
+
+    saveBtn.addEventListener('click',()=>{
+      const data={
+        id:uid(),
+        workerName:workerName.value.trim(),
+        workerId:workerId.value.trim(),
+        role:role.value.trim(),
+        phone:phone.value.trim(),
+        assignedVehicle:assignedVehicle.value,
+        vehicleNo:vehicleNo.value.trim(),
+        vehicleType:vehicleType.value,
+        vehicleCondition:vehicleCondition.value.trim(),
+        attendanceDate:attendanceDate.value
+      };
+      if(!data.workerName){alert("Enter worker name.");return;}
+      const list=getEntries();list.push(data);saveEntries(list);
+      if(data.vehicleNo)addVehicleOption(data.vehicleNo);
+      form.reset();alert("✅ Entry saved locally!");
+    });
+
+    deleteAllBtn.addEventListener('click',()=>{
+      if(confirm("Delete all local entries?")){
+        localStorage.removeItem(STORAGE_KEY);
+        assignedVehicle.innerHTML='<option value="">-- none --</option>';
+        alert("🗑️ All entries deleted!");
+      }
+    });
+
+    (function init(){
+      const existing=getEntries();const vSet=new Set();
+      existing.forEach(it=>{if(it.vehicleNo)vSet.add(it.vehicleNo);if(it.assignedVehicle)vSet.add(it.assignedVehicle);});
+      vSet.forEach(v=>addVehicleOption(v));
+    })();
+  </script>
+</body>
+</html>
