@@ -5,13 +5,16 @@ This platform replaces traditional manual, error-prone paperwork with an automat
 1. Worker & Vehicle Data Integration (form5.html)Comprehensive Entry Logging: Captures worker names, unique IDs, assigned roles, contact details, dates, and vehicle metrics seamlessly.  Dynamic Vehicle Management: Automatically reads active vehicle registration details to populate vehicle selection queues dynamically.  Condition & Maintenance Tracking: Allows supervisors to append status logs concerning machinery fuel, tyres, or operational damages.
 2. Supervisor Analytics Dashboard (index.html)Real-time Counter Metrics: Instantly reflects aggregate records indicating Total Entries, Unique Active Workers, and Unique Tracked Vehicles.  Segmented Information Views: Automatically parses records into two operational categories:Workers With Vehicles Assigned: For operators driving active machinery.  Workers Only: Highlights field workers requiring vehicle assignment with striking alerts.  Live Search Optimization: High-performance filtering component enabling supervisors to search data rows instantaneously by name, role, or vehicle number.
 
-🛠️ Tech Stack & ArchitectureFrontend: HTML5 (Semantic Forms & Arrays), CSS3 (Modern Glassmorphism UI utilizing backdrop blur effects and custom CSS variable themes).  Core Logic: Vanilla JavaScript (ES6 Document Object Model interactions, custom unique ID string generators, and robust array filtering mechanisms).  Storage Engine: Browser-based Web Storage API (localStorage) utilizing JSON string formatting for persistence across local environments.
+🛠️ Tech Stack & ArchitectureFrontend: 
+HTML5 (Semantic Forms & Arrays), CSS3 (Modern Glassmorphism UI utilizing backdrop blur effects and custom CSS variable themes).  Core Logic: Vanilla JavaScript (ES6 Document Object Model interactions, custom unique ID string generators, and robust array filtering mechanisms).  Storage Engine: Browser-based Web Storage API (localStorage) utilizing JSON string formatting for persistence across local environments.
 
 📂 Project Directory Structure :
 
 Bash
 ├── welcome.html   # Main system portal gate with structural landing layouts
+
 ├── form5.html     # Secure workspace entry portal containing input forms
+
 └── index.html     # Centralized dashboard panel featuring analytic storage maps
 
 ⚙️ How to Run the App LocallyClone the Project Repository:Bashgit clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY_NAME.git
