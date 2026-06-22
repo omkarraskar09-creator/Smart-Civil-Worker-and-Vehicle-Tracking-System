@@ -6,6 +6,7 @@ This platform replaces traditional manual, error-prone paperwork with an automat
 2. Supervisor Analytics Dashboard (index.html)Real-time Counter Metrics: Instantly reflects aggregate records indicating Total Entries, Unique Active Workers, and Unique Tracked Vehicles.  Segmented Information Views: Automatically parses records into two operational categories:Workers With Vehicles Assigned: For operators driving active machinery.  Workers Only: Highlights field workers requiring vehicle assignment with striking alerts.  Live Search Optimization: High-performance filtering component enabling supervisors to search data rows instantaneously by name, role, or vehicle number.
 
 🛠️ Tech Stack & ArchitectureFrontend: 
+
 HTML5 (Semantic Forms & Arrays), CSS3 (Modern Glassmorphism UI utilizing backdrop blur effects and custom CSS variable themes).  Core Logic: Vanilla JavaScript (ES6 Document Object Model interactions, custom unique ID string generators, and robust array filtering mechanisms).  Storage Engine: Browser-based Web Storage API (localStorage) utilizing JSON string formatting for persistence across local environments.
 
 📂 Project Directory Structure :
